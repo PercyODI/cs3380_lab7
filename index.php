@@ -11,23 +11,37 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
         
         <?php
-          ini_set('display_errors',1);
-          ini_set('display_startup_errors',1);
-          error_reporting(E_ALL);
-        
-          $SERVER = 'us-cdbr-azure-central-a.cloudapp.net';
-          $USER = 'bf7f0622e9427e';
-          $PASS = '720ad0bb';
-          $DATABASE = 'cs3380-pah9qd';
-          
-          $mylink = new mysqli($SERVER, $USER, $PASS, $DATABASE);
-          $_SESSION['mylink'] = $mylink;
-          
+            ini_set('display_errors',1);
+            ini_set('display_startup_errors',1);
+            error_reporting(E_ALL);
+            
+            $SERVER = 'us-cdbr-azure-central-a.cloudapp.net';
+            $USER = 'bf7f0622e9427e';
+            $PASS = '720ad0bb';
+            $DATABASE = 'cs3380-pah9qd';
+            
+            $mylink = new mysqli($SERVER, $USER, $PASS, $DATABASE);
+            $_SESSION['mylink'] = $mylink;
+            
+            function is_selected($name) {
+                if (isset($_POST['fromRadio'])) {
+                    if ($name == $_POST['fromRadio']) {
+                        echo " checked";
+                    } else {
+                        echo "";
+                    }
+                }
+            }
         ?>  
         
         <style>
-            table {
+            table, tr, td {
+                border: 1px solid black;
                 border-collapse: collapse;
+            }
+            
+            td {
+                padding: 5px;
             }
         </style>
     </head>
@@ -38,19 +52,19 @@
                     <div class="form-group">
                         <div class="radio">
                             <label for="country">
-                                <input type="radio" name="fromRadio" value="country" id="country">
+                                <input type="radio" name="fromRadio" value="country" id="country"<?=is_selected("country")?>>
                                 Country
                             </label>
                         </div>
                         <div class="radio">
                             <label for="city">
-                                <input type="radio" name="fromRadio" value="City" id="city"> 
+                                <input type="radio" name="fromRadio" value="City" id="city"<?=is_selected("City")?>> 
                                 City
                             </label>
                         </div>
                         <div class="radio">
                             <label for="language">
-                                <input type="radio" name="fromRadio" value="countrylanguage" id="language">
+                                <input type="radio" name="fromRadio" value="countrylanguage" id="language"<?=is_selected("countrylanguage")?>>
                                 Language
                             </label>
                         </div>  
@@ -61,40 +75,34 @@
                         <button type="submit" class="btn btn-default">Submit</button>
                     </div>
                 </form>
-                
-                <?php
-                    echo "Hello?";
-                    echo $_POST['fromRadio'];
-                    echo $_POST['searchText'];
-                    // print_r($mylink);
-                    // $stmt = $mylink->prepare("SELECT * FROM city WHERE name='english'");
-                    // print_r($stmt);
-                    $results = null;
-                    // $stmt = $mylink->stmt_init();
-                    if($stmt = $mylink->prepare("SELECT CountryCode FROM countrylanguage WHERE language=?")) {
-                        echo "<br>In If!<br>";
-                        // $stmt->bind_param("ss", $_POST['fromRadio'], $_POST['searchText']);
-                        $stmt->bind_param("s", $_POST['searchText']);
-                        $stmt->execute();
-                        $stmt->bind_result($results);
-                        while($stmt->fetch()) {
-                            echo "<br>";
-                            print_r($results);
-                        }
-                        $stmt->close();
-                    } else {
-                        echo "<br>In Else :(";
-                    }
-                    
-                    if ( false===$stmt ) {
-                      die('prepare() failed: ' . htmlspecialchars($mylink->error));
-                    }
-                    mysqli_close($mylink);
-                ?>
                 <table>
-                    
+                    <?php
+                        // print_r($mylink);
+                        // $stmt = $mylink->prepare("SELECT * FROM city WHERE name='english'");
+                        // print_r($stmt);
+                        $results = 0;
+                        // $stmt = $mylink->stmt_init();
+                        if($stmt = $mylink->prepare("select l.countrycode, c.name from countrylanguage as l inner join country as c on c.code = l.countrycode WHERE language=?")) {
+                            $stmt->bind_param("s", $_POST['searchText']);
+                            $stmt->execute();
+                            $stmt->bind_result($countrycode, $name);
+                            while($stmt->fetch()) {
+                                echo "<tr><td>$countrycode</td><td>$name</td></tr>";
+                                $results++;
+                            }
+                            $stmt->close();
+                        } else {
+                            echo "<br>In Else :(";
+                        }
+                        
+                        if ( false===$stmt ) {
+                          die('prepare() failed: ' . htmlspecialchars($mylink->error));
+                        }
+                        mysqli_close($mylink);
+                        
+                    ?>
                 </table>
-                
+                <?php echo "Number of Results: $results"; ?>
             </div>
         </div>
     </body>
