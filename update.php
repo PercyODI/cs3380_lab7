@@ -4,15 +4,18 @@
         <?php
             include_once('header.php');
             
-            //Set Primary Key Where String
+            //Set Where String
             if ($_POST['searchingTable'] == "country") {
-                $primaryKeyWhere = "code";
+                $whereStr = "code = '" . $_POST['rowData'] . "'";
             }
             else if($_POST['searchingTable'] == "city") {
-                $primaryKeyWhere = "id";
+                $whereStr = "id = " . $_POST['rowData'];
             }
             else if($_POST['searchingTable'] == "countrylanguage") {
-                $primaryKeyWhere = "countrycode";
+                $rowDataArr = unserialize($_POST['rowData']);
+                $whereStr = "countrycode = '" . $rowDataArr[0] . "' and language = '" . $rowDataArr[1] . "'";
+            } else {
+                echo "Error is Set Where String!";
             }
             
             $stmt = null;
@@ -20,8 +23,7 @@
             $params = array();
             $rowData = array();
             
-            if($stmt = $mylink->prepare("SELECT * FROM {$_POST['searchingTable']} WHERE $primaryKeyWhere = ?")) {
-                $stmt->bind_param("s", $_POST['rowData']);
+            if($stmt = $mylink->prepare("SELECT * FROM {$_POST['searchingTable']} WHERE $whereStr")) {
                 $stmt->execute();
                 $stmt->store_result();
                 $metaData = $stmt->result_metadata();
@@ -30,27 +32,51 @@
                     $fields[] = $holder->name;
                 };
                 call_user_func_array(array($stmt, 'bind_result'), $params);
-                
+                $stmt->fetch();
             }
             
         ?>
+        
+        <style>
+            .well {
+                text-align: center;
+            }
+        </style>
+        
+       
     </head>
     <body>
-        <?php
-            echo $_POST['searchingTable'];
-            print_r("<br><hr><br>");
-            $_POST['searchingTable'] != "countrylanguage" 
-                ? print_r($_POST['rowData'])
-                : print_r(unserialize($_POST['rowData']));
-            print_r("<br><hr><br>");
-            while($stmt->fetch()) {
-                foreach($rowData as $dataPoint) {
-                    echo $dataPoint . " - ";
+        <div class="container">
+        <div class="row">
+        <div class="col-sm-6 col-sm-offset-3">
+        <div class="well"><h2>Update <?=$_POST['searchingTable']?></h2></div>
+        <form class="form-horizontal">
+            
+            <?php
+                foreach($fields as $i => $field) {
+                    echo "<div class='form-group'>\n";
+                    echo "<label for='$field' class='col-sm-2'>$field</label>\n";
+                    echo "<div class='col-sm-10'>\n";
+                    echo "<input type='text' class='form-control' id='$field' value='" . $rowData[$field] . "'>\n";
+                    echo "</div>\n";
+                    echo "</div>\n";
                 }
-            }
-            foreach($fields as $field) {
-                echo $field . "<br>";
-            }
-        ?>
+                // Show all data values
+                // foreach($rowData as $dataPoint) {
+                //     echo $dataPoint . " - ";
+                // }
+                
+                // Show all field names
+                // foreach($fields as $field) {
+                //     echo $field . "<br>";
+                // }
+            ?>
+            <div class="btn-toolbar">
+                <a href type="button" class="btn btn-default pull-right" id="cancel-btn" href="http://cs3380-pah9qd.cloudapp.net/lab7/lab7.php" role=button>Cancel</button>
+                <button type="reset" class="btn btn-default pull-right">Reset</button>
+                <button type="submit" class="btn btn-default pull-right">Save</button>
+            </div>
+        </form>
+        </div></div></div>
     </body>
 </html>
