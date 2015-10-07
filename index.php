@@ -11,17 +11,7 @@
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
         
         <?php
-            ini_set('display_errors',1);
-            ini_set('display_startup_errors',1);
-            error_reporting(E_ALL);
-            
-            $SERVER = 'us-cdbr-azure-central-a.cloudapp.net';
-            $USER = 'bf7f0622e9427e';
-            $PASS = '720ad0bb';
-            $DATABASE = 'cs3380-pah9qd';
-            
-            $mylink = new mysqli($SERVER, $USER, $PASS, $DATABASE);
-            $_SESSION['mylink'] = $mylink;
+            include_once('header.php');
             
             //Pre-selected the previously selected radio button
             function is_selected($value) {
@@ -56,7 +46,7 @@
                 
             isset($_POST['searchText'])
                 ? $searchLike = $_POST['searchText'] . '%'
-                : $searchLike = "";
+                : $searchLike = " ";
                 
             function showCity() {
                 global $mylink;
@@ -79,6 +69,7 @@
                         $i++;
                     }
                     array_push($tableHeaders, "Update", "Delete", "ID", "Name", "Country Code", "District", "Population");
+                    
                     if ( false===$stmt ) {
                       die('prepare() failed: ' . htmlspecialchars($mylink->error));
                     }
@@ -142,6 +133,20 @@
                       die('prepare() failed: ' . htmlspecialchars($mylink->error));
                     }
                     $stmt->close();
+                }
+            }
+            
+            function findPrimaryKey($table, $row) {
+                if ($table == 'city') {
+                    return $row[0];
+                } 
+                else if ($table == 'country') {
+                    return $row[0];
+                }
+                else if ($table == 'countrylanguage') {
+                    return serialize(array_slice($row, 0, 2));
+                } else {
+                    return "Error in findPrimaryKey()!!";
                 }
             }
                 
@@ -236,12 +241,12 @@
                         echo "\n\n<tr>\n";
                         echo "<form action='update.php' method='POST'>\n";
                         echo "<input type='hidden' name='searchingTable' value='$searchingTable'>\n";
-                        echo "<input type='hidden' name='rowData' value='" . serialize($row) . "'>\n";
+                        echo "<input type='hidden' name='rowData' value='" . findPrimaryKey($searchingTable, $row) . "'>\n";
                         echo "<td><button type='submit' name='update'>Update</button></td>\n";
                         echo "</form>\n";
                         echo "<form action='delete.php' method='POST'>\n";
                         echo "<input type='hidden' name='searchingTable' value='$searchingTable'>\n";
-                        echo "<input type='hidden' name='rowData' value='" . serialize($row) . "'>\n";
+                        echo "<input type='hidden' name='rowData' value='" . findPrimaryKey($searchingTable, $row) . "'>\n";
                         echo "<td><button type='submit' name='delete'>Delete</button></td>\n";
                         echo "</form>\n";
                         foreach ($row as $dataPoint) {
