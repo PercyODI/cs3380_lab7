@@ -23,9 +23,9 @@
             $mylink = new mysqli($SERVER, $USER, $PASS, $DATABASE);
             $_SESSION['mylink'] = $mylink;
             
-            function is_selected($name) {
+            function is_selected($value) {
                 if (isset($_POST['fromRadio'])) {
-                    if ($name == $_POST['fromRadio']) {
+                    if ($value == $_POST['fromRadio']) {
                         echo " checked";
                     } else {
                         echo "";
@@ -37,41 +37,37 @@
             $tableData = array();
             $tableHeaders = array();
             $stmt = null;
-            $whereFrom = $_POST['fromRadio'];
-            // "select l.countrycode, c.name as country, city.name, l.language 
-            // from (
-            //     select c.name from countrylanguage as l 
-            //     inner join country as c 
-            //     on c.code = l.countrycode 
-            // ) as languageCountry inner join (
-            //     select * from city
-            //     inner join country as c
-            //     on c.code = city.countrycode 
-            // ) as cityCountry
-            // on languageCountry.co
-            // WHERE country LIKE ?"
-            if($stmt = $mylink->prepare("select country.code, country.name, city.name, countrylanguage.language 
-                                        from country, city, countrylanguage
-                                        where country.code = countrylanguage.countrycode
-                                            AND country.code = city.countrycode
-                                            AND $whereFrom LIKE ? ")) {
-                $searchLike = $_POST['searchText'] . '%';
-                $stmt->bind_param("s", $searchLike);
-                $stmt->execute();
-                $stmt->bind_result($countrycode, $countryname, $cityname, $language);
-                array_push($tableHeaders, "Country Code", "Country Name", "City Name", "Language");
-                $i = 0;
-                while($stmt->fetch()) {
-                    $tableData[$i][] = $countrycode;
-                    $tableData[$i][] = $countryname;
-                    $tableData[$i][] = $cityname;
-                    $tableData[$i][] = $language;
-                    $i++;
-                }
-                $stmt->close();
-            } else {
-                echo "<br>In Else :(";
-            }
+            isset($_POST['fromRadio'])
+                ? $searchingTable = $_POST['fromRadio']
+                : $searchingTable = "city.name";
+                
+            isset($_POST['searchText'])
+                ? $searchLike = $_POST['searchText'] . '%'
+                : $searchLike = "";
+                
+            
+            // if($stmt = $mylink->prepare("select country.code, country.name, city.name, countrylanguage.language 
+            //                             from country, city, countrylanguage
+            //                             where country.code = countrylanguage.countrycode
+            //                                 AND country.code = city.countrycode
+            //                                 AND $searchingTable LIKE ? 
+            //                             ORDER BY $searchingTable")) {
+            //     $stmt->bind_param("s", $searchLike);
+            //     $stmt->execute();
+            //     $stmt->bind_result($countrycode, $countryname, $cityname, $language);
+            //     array_push($tableHeaders, "Update", "Delete", "Country Code", "Country Name", "City Name", "Language");
+            //     $i = 0;
+            //     while($stmt->fetch()) {
+            //         $tableData[$i][] = $countrycode;
+            //         $tableData[$i][] = $countryname;
+            //         $tableData[$i][] = $cityname;
+            //         $tableData[$i][] = $language;
+            //         $i++;
+            //     }
+            //     $stmt->close();
+            // } else {
+            //     echo "<br>In Else :(";
+            // }
             
             //Check for errors and close link
             if ( false===$stmt ) {
@@ -106,19 +102,19 @@
                     <div class="form-group">
                         <div class="radio">
                             <label for="country">
-                                <input type="radio" name="fromRadio" value="country.name" id="country"<?=is_selected("country")?>>
+                                <input type="radio" name="fromRadio" value="country" id="country"<?=is_selected("country")?>>
                                 Country
                             </label>
                         </div>
                         <div class="radio">
                             <label for="city">
-                                <input type="radio" name="fromRadio" value="city.name" id="city"<?=is_selected("city")?>> 
+                                <input type="radio" name="fromRadio" value="city" id="city"<?=is_selected("city")?>> 
                                 City
                             </label>
                         </div>
                         <div class="radio">
                             <label for="language">
-                                <input type="radio" name="fromRadio" value="countrylanguage.language" id="language"<?=is_selected("language")?>>
+                                <input type="radio" name="fromRadio" value="countrylanguage" id="language"<?=is_selected("countrylanguage")?>>
                                 Language
                             </label>
                         </div>  
@@ -135,7 +131,12 @@
                             echo "<th>$header</th>";
                         }
                         foreach ($tableData as $row) {
-                            echo "<tr>";
+                            echo "\n\n<tr>";
+                            echo "<form action='update.php' method='POST'>";
+                            echo "<input type='hidden' name='searchingTable' value='$searchingTable'>";
+                            echo "<input type='hidden' name='code' value='{$row[0]}'>";
+                            echo "<td><button type='submit' name='searchingTable'>Update</button></td>";
+                            echo "<td><button type='submit' name='searchingTable''>Delete</button></td>";
                             foreach ($row as $dataPoint) {
                                 echo "<td>$dataPoint</td>";
                             }
