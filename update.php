@@ -4,6 +4,10 @@
         <?php
             include_once('header.php');
             
+            //Save searchingTable
+            $_SESSION['searchingTable'] = $_POST['searchingTable'];
+            $_SESSION['pk'] = $_POST['rowData'];
+            
             //Set Where String
             if ($_POST['searchingTable'] == "country") {
                 $whereStr = "code = '" . $_POST['rowData'] . "'";
