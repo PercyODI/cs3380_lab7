@@ -48,16 +48,16 @@
     <body>
         <div class="container">
         <div class="row">
-        <div class="col-sm-6 col-sm-offset-3">
+        <div class="col-sm-8 col-sm-offset-2">
         <div class="well"><h2>Update <?=$_POST['searchingTable']?></h2></div>
-        <form class="form-horizontal">
+        <form class="form-horizontal" action="update_action.php" method="POST">
             
             <?php
                 foreach($fields as $i => $field) {
                     echo "<div class='form-group'>\n";
-                    echo "<label for='$field' class='col-sm-2'>$field</label>\n";
-                    echo "<div class='col-sm-10'>\n";
-                    echo "<input type='text' class='form-control' id='$field' value='" . $rowData[$field] . "'>\n";
+                    echo "<label for='$field' class='col-sm-2'>$field</label><br>\n";
+                    echo "<div class='col-sm-11 col-sm-offset-1'>\n";
+                    echo "<input type='text' class='form-control' id='$field' name='$field' value='" . $rowData[$field] . "'>\n";
                     echo "</div>\n";
                     echo "</div>\n";
                 }
@@ -72,7 +72,7 @@
                 // }
             ?>
             <div class="btn-toolbar">
-                <a href type="button" class="btn btn-default pull-right" id="cancel-btn" href="http://cs3380-pah9qd.cloudapp.net/lab7/lab7.php" role=button>Cancel</button>
+                <a href="http://cs3380-pah9qd.cloudapp.net/lab7/index.php" type="button" class="btn btn-default pull-right" id="cancel-btn" role="button">Cancel</a>
                 <button type="reset" class="btn btn-default pull-right">Reset</button>
                 <button type="submit" class="btn btn-default pull-right">Save</button>
             </div>
