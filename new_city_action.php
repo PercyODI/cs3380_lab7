@@ -17,8 +17,8 @@
                 header('Location: index.php');
                 unset($_SESSION['newID']);
             } else {
-                // $_SESSION['message'] = "Error updating record: " . $mylink->error;
-                // header('Location: new_city.php');
+                $_SESSION['message'] = "Error updating record: " . $mylink->error;
+                header('Location: new_city.php');
             }
         ?>
     </head>

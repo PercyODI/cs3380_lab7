@@ -141,7 +141,10 @@
                             // echo "<input type='hidden' name='pk' value='" . findPrimaryKey($_SESSION['table'], $row) . "'>\n";
                             echo "<td><button type='submit' name='delete' class='delete-btn' pk='" . findPrimaryKey($_SESSION['table'], $row) . "'>Delete</button></td>\n";
                             echo "</form>\n";
-                            foreach ($row as $dataPoint) {
+                            foreach ($row as $key => $dataPoint) {
+                                if ($key == "Percentage" || $key == "LifeExpectancy" || $key == "GNP" || $key == "SurfaceArea") {
+                                    $dataPoint = round($dataPoint, 1);
+                                }
                                 echo "<td>$dataPoint</td>";
                             }
                             echo "</tr>\n";

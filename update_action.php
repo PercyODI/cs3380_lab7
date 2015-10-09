@@ -5,6 +5,7 @@
             include_once('header.php');
             $sql = "UPDATE " . $_SESSION['table'] . " SET ";
             foreach($_POST as $key => $val) {
+                $val = $mylink->real_escape_string($val);
                 if($val != null) {
                     $sql .= $key . " = '" . $val . "'";
                 } else {

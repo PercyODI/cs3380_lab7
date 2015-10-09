@@ -26,6 +26,11 @@
                 $stmt->fetch();
             }
             
+            if(isset($rowData['Percentage'])) {
+                $rowData['Percentage'] = round($rowData['Percentage'], 1);
+            }
+                
+            
             if($_SESSION['table'] == 'country') {
                 $editableFields = array("LocalName", "GovernmentForm", "IndepYear", "Popluation");
             }
@@ -38,12 +43,49 @@
                 $editableFields = array();
             }
             
-            function disabledAttr($field) {
+            function inputExtra($field) {
                 global $editableFields;
-                if (in_array($field, $editableFields)) {
-                    return "";
-                } else {
-                    return "disabled";
+                $extraStr = "";
+                
+                if (!in_array($field, $editableFields)) {
+                    $extraStr .= "disabled ";
+                }
+                
+                if($field == "Name") {
+                    $extraStr .= "maxlength='35' ";
+                }
+                
+                if($field == "District") {
+                    $extraStr .= "maxlength='20' ";
+                }
+                
+                if($field == "LocalName") {
+                    $extraStr .= "maxlength='45' ";
+                }
+                
+                if($field == "GovernmentForm") {
+                    $extraStr .= "maxlength='45' ";
+                }
+                
+                if($field == "IndepYear") {
+                    $extraStr .= "type='number' min='0' max='32767' ";
+                }
+                
+                if($field == "Population") {
+                    $extraStr .= "type='number' min='0' max='2147483647' ";
+                } 
+                
+                if($field == "Percentage") {
+                    $extraStr .= "type='number' min='0' max='100' step='0.1' ";
+                }
+                
+                return $extraStr;
+            }
+            
+            function officalChecked($field, $torf) {
+                global $rowData;
+                if($rowData[$field] == $torf) {
+                    return " selected";
                 }
             }
             
@@ -62,7 +104,7 @@
         <div class="row">
         <div class="col-sm-8 col-sm-offset-2">
         <div class="well"><h2>Update <?=$_SESSION['table']?></h2></div>
-        <form class="form-horizontal" action="update_action.php" method="POST">
+        <form class="form" action="update_action.php" method="POST">
             
             <?php
                 if(isset($_SESSION['message'])) {
@@ -73,7 +115,15 @@
                     echo "<div class='form-group'>\n";
                     echo "<label for='$field' class='col-sm-2'>$field</label><br>\n";
                     echo "<div class='col-sm-11 col-sm-offset-1'>\n";
-                    echo "<input type='text' class='form-control' id='$field' name='$field' value='" . $rowData[$field] . "' " . disabledAttr($field) . ">\n";
+                    if($field == "IsOfficial") {
+                        echo "<select class='form-control' name='$field''>";
+                        echo "<option class='form-control' value='T'" . officalChecked($field, "T") . ">True</option>\n";
+                        echo "<option class='form-control' value='F'" . officalChecked($field, "F") . ">False</option>\n";
+                        echo "</select>";
+                    } else {
+                        echo "<input class='form-control' id='$field' name='$field' value='" . $rowData[$field] . "' " . inputExtra($field) . ">\n";
+
+                    }
                     echo "</div>\n";
                     echo "</div>\n";
                 }

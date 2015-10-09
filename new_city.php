@@ -40,11 +40,19 @@
             function inputExtra($fieldName) {
                 $extraStr = "";
                 if($fieldName == "ID") {
-                    $extraStr .= "disabled id='ID'";
+                    $extraStr .= "disabled id='ID' ";
+                }
+                
+                if($fieldName == "Name") {
+                    $extraStr .= "maxlength='35' ";
+                }
+                
+                if($fieldName == "District") {
+                    $extraStr .= "maxlength='20' ";
                 }
                 
                 if($fieldName == "Population") {
-                    $extraStr .= "type='number' min='0' max='99999999999'";
+                    $extraStr .= "type='number' min='0' max='2147483647' ";
                 } else {
                     $extraStr .= "type = 'text' ";
                 }
@@ -62,10 +70,12 @@
         <script>
             $(document).ready(function () {
                 $('#cancel-btn').click(function(e) {
-                    confirm("Are you watching?");
-                    console.log("ID = " + $('#ID').val());
-                    $.post("delete.php", {cancelDel: "ID = " + $('#ID').val()}).done(function(data) {
-                        console.log(data);
+                    // confirm("Are you watching?");
+                    // e.preventDefault();
+                    // console.log("ID = " + $('#ID').val());
+                    var cancelStr = "ID = " + $('#ID').val();
+                    $.post("delete.php", {cancelDel: cancelStr}).done(function(data) {
+                        // console.log(data);
                     });
                 });
             });
