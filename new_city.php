@@ -4,9 +4,14 @@
         <?php
             include_once('header.php');
             
-            //Find
-            $mylink->query("INSERT INTO city (CountryCode) VALUES ((select code from country limit 1))");
-            $newID = $mylink->insert_id;
+            // Create new empty row
+            if(isset($_SESSION['newID']) == false) {
+                $mylink->query("INSERT INTO city (CountryCode) VALUES ((select code from country limit 1))");
+                $newID = $mylink->insert_id;
+                $_SESSION['newID'] = $newID;
+            } else {
+                $newID = $_SESSION['newID'];
+            }
             
             $stmt = null;
             $fields = array();
@@ -27,12 +32,10 @@
             
             //Find list of CountryCodes
             $codeArr = array();
-            $codeQy = $mylink->query("SELECT code FROM country");
-            while ($code = $codeQy->fetch_row()) {
-                $codeArr[] = $code[0];
+            $codeQy = $mylink->query("SELECT code, name FROM country ORDER BY name");
+            while ($code = $codeQy->fetch_assoc()) {
+                $codeArr[$code['code']] = $code['name'];
             }
-            
-            print_r($codeArr);
             
             function inputExtra($fieldName) {
                 $extraStr = "";
@@ -49,6 +52,18 @@
                 return $extraStr;
             }
         ?>
+        
+        <style>
+            .well {
+                text-align: center;
+            }
+        </style>
+        
+        <script>
+            $(#cancel-btn).click(function() {
+                
+            })
+        </script>
     </head>
     <body>
         <div class="container">
@@ -66,13 +81,14 @@
                     echo "<div class='form-group'>\n";
                     echo "<label for='$field' class='col-sm-2'>$field</label><br>\n";
                     echo "<div class='col-sm-11 col-sm-offset-1'>\n";
-                    if($field != 'Countrycode') {
+                    if($field != 'CountryCode') {
                         echo "<input class='form-control' id='$field' name='$field' value='" . $rowData[$field] . "' " . inputExtra($field) . ">\n";
                     } else {
-                        echo "<select class='form-control'>\n";
-                        foreach($codeArr as $code) {
-                            echo "<option>$code</option>\n";
+                        echo "<select class='form-control' name='$field'>\n";
+                        foreach($codeArr as $key => $val) {
+                            echo "<option value='$key'>$val</option>\n";
                         }
+                        echo "</select>";
                     }
                     echo "</div>\n";
                     echo "</div>\n";

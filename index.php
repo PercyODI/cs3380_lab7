@@ -116,6 +116,12 @@
                 </form>
                 
                 <br>
+                <?php
+                    if(isset($_SESSION['message'])) {
+                        echo "<div class='alert alert-info' role='alert'>" . $_SESSION['message'] . "</div>";
+                        unset($_SESSION['message']);
+                    }
+                ?>
             </div>
         </div>
             <table class="table table-condensed table-cust">
@@ -123,20 +129,24 @@
                     foreach($tableHeaders as $header) {
                         echo "<th>$header</th>";
                     }
-                    foreach ($tableData as $row) {
-                        echo "\n\n<tr>\n";
-                        echo "<form action='update.php' method='POST'>\n";
-                        echo "<input type='hidden' name='pk' value='" . findPrimaryKey($_SESSION['table'], $row) . "'>\n";
-                        echo "<td><button type='submit' name='update'>Update</button></td>\n";
-                        echo "</form>\n";
-                        // echo "<form action='delete.php' method='POST'>\n";
-                        // echo "<input type='hidden' name='pk' value='" . findPrimaryKey($_SESSION['table'], $row) . "'>\n";
-                        echo "<td><button type='submit' name='delete' class='delete-btn' pk='" . findPrimaryKey($_SESSION['table'], $row) . "'>Delete</button></td>\n";
-                        echo "</form>\n";
-                        foreach ($row as $dataPoint) {
-                            echo "<td>$dataPoint</td>";
+                    if($tableData != null) {
+                        foreach ($tableData as $row) {
+                            echo "\n\n<tr>\n";
+                            echo "<form action='update.php' method='POST'>\n";
+                            echo "<input type='hidden' name='pk' value='" . findPrimaryKey($_SESSION['table'], $row) . "'>\n";
+                            echo "<td><button type='submit' name='update'>Update</button></td>\n";
+                            echo "</form>\n";
+                            // echo "<form action='delete.php' method='POST'>\n";
+                            // echo "<input type='hidden' name='pk' value='" . findPrimaryKey($_SESSION['table'], $row) . "'>\n";
+                            echo "<td><button type='submit' name='delete' class='delete-btn' pk='" . findPrimaryKey($_SESSION['table'], $row) . "'>Delete</button></td>\n";
+                            echo "</form>\n";
+                            foreach ($row as $dataPoint) {
+                                echo "<td>$dataPoint</td>";
+                            }
+                            echo "</tr>\n";
                         }
-                        echo "</tr>\n";
+                    } else {
+                        echo "<h2>No Results Found for Current Search</h2>";
                     }
                 ?>
             </table>
