@@ -40,7 +40,7 @@
             function inputExtra($fieldName) {
                 $extraStr = "";
                 if($fieldName == "ID") {
-                    $extraStr .= "disabled ";
+                    $extraStr .= "disabled id='ID'";
                 }
                 
                 if($fieldName == "Population") {
@@ -60,9 +60,9 @@
         </style>
         
         <script>
-            $(#cancel-btn).click(function() {
-                
-            })
+            $('#cancel-btn').click(function() {
+                $.post("delete.php", {cancelDel: "ID = " + $('#ID').val}).done(function(data) {});
+            });
         </script>
     </head>
     <body>

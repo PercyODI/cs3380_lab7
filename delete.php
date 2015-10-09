@@ -1,8 +1,12 @@
 <?php
     include_once('database_and_functions.php');
     
-    if()
-    setSessionPk($_POST['pk']);
+    if(array_key_exists('cancelDel', $_POST) != false) {
+        setSessionPk($_POST['pk']);
+    } else {
+        $_SESSION['pkSqlStr'] = $_POST['cancelDel'];
+        unset($_POST['cancelDel']);
+    }
     
     $sql = "DELETE FROM {$_SESSION['table']} WHERE {$_SESSION['pkSqlStr']} LIMIT 1";
     echo $sql;
