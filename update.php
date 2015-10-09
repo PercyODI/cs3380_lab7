@@ -6,21 +6,30 @@
             
             //Save searchingTable
             $_SESSION['searchingTable'] = $_POST['searchingTable'];
-            $_SESSION['pk'] = $_POST['rowData'];
+            $_SESSION['pk'] = unserialize($_POST['pk']);
+            
+            // Sets where string
+            foreach($_SESSION['pk'] as $key => $value) {
+                $whereStr = "$key = '$value'";
+                end($_SESSION['pk']);
+                if($key != key($_SESSION['pk'])) {
+                    $whereStr .= " and ";
+                }
+            }
             
             //Set Where String
-            if ($_POST['searchingTable'] == "country") {
-                $whereStr = "code = '" . $_POST['rowData'] . "'";
-            }
-            else if($_POST['searchingTable'] == "city") {
-                $whereStr = "id = " . $_POST['rowData'];
-            }
-            else if($_POST['searchingTable'] == "countrylanguage") {
-                $rowDataArr = unserialize($_POST['rowData']);
-                $whereStr = "countrycode = '" . $rowDataArr[0] . "' and language = '" . $rowDataArr[1] . "'";
-            } else {
-                echo "Error is Set Where String!";
-            }
+            // if ($_POST['searchingTable'] == "country") {
+            //     $whereStr = "code = '" . $_POST['rowData'] . "'";
+            // }
+            // else if($_POST['searchingTable'] == "city") {
+            //     $whereStr = "id = " . $_POST['rowData'];
+            // }
+            // else if($_POST['searchingTable'] == "countrylanguage") {
+            //     $rowDataArr = unserialize($_POST['rowData']);
+            //     $whereStr = "countrycode = '" . $rowDataArr[0] . "' and language = '" . $rowDataArr[1] . "'";
+            // } else {
+            //     echo "Error is Set Where String!";
+            // }
             
             $stmt = null;
             $fields = array();
@@ -65,15 +74,6 @@
                     echo "</div>\n";
                     echo "</div>\n";
                 }
-                // Show all data values
-                // foreach($rowData as $dataPoint) {
-                //     echo $dataPoint . " - ";
-                // }
-                
-                // Show all field names
-                // foreach($fields as $field) {
-                //     echo $field . "<br>";
-                // }
             ?>
             <div class="btn-toolbar">
                 <a href="http://cs3380-pah9qd.cloudapp.net/lab7/index.php" type="button" class="btn btn-default pull-right" id="cancel-btn" role="button">Cancel</a>

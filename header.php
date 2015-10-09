@@ -15,4 +15,6 @@
     
     $mylink = new mysqli($SERVER, $USER, $PASS, $DATABASE);
     $_SESSION['mylink'] = $mylink;
+    
+    include_once('functions.php');
 ?>

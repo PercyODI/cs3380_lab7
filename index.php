@@ -40,133 +40,29 @@
             $tableHeaders = array();
             $stmt = null;
             isset($_POST['fromRadio'])
-                ? $searchingTable = $_POST['fromRadio']
-                : $searchingTable = "city";
+                ? $_SESSION['table'] = $_POST['fromRadio']
+                : $_SESSION['table'] = "city";
                 
             isset($_POST['searchText'])
                 ? $searchLike = $_POST['searchText'] . '%'
                 : $searchLike = " ";
                 
-            function showCity() {
-                global $mylink;
-                global $tableHeaders;
-                global $searchLike;
-                global $stmt;
-                global $tableData;
+
                 
-                if($stmt = $mylink->prepare("select id, name, countrycode, district, population FROM city WHERE name LIKE ? ORDER BY name")) {
-                    $stmt->bind_param("s", $searchLike);
-                    $stmt->execute();
-                    $stmt->bind_result($id, $name, $countrycode, $district, $population);
-                    $i = 0;
-                    while($stmt->fetch()) {
-                        $tableData[$i][] = $id;
-                        $tableData[$i][] = $name;
-                        $tableData[$i][] = $countrycode;
-                        $tableData[$i][] = $district;
-                        $tableData[$i][] = $population;
-                        $i++;
-                    }
-                    array_push($tableHeaders, "Update", "Delete", "ID", "Name", "Country Code", "District", "Population");
-                    
-                    if ( false===$stmt ) {
-                      die('prepare() failed: ' . htmlspecialchars($mylink->error));
-                    }
-                    $stmt->close();
-                }
-            }
-            
-            function showCountry() {
-                global $mylink;
-                global $tableHeaders;
-                global $searchLike;
-                global $stmt;
-                global $tableData;
-                
-                if($stmt = $mylink->prepare("select code, name, continent, 
-                    region, surfacearea, indepyear, population, lifeexpectancy, 
-                    gnp, gnpold, localname, governmentform, headofstate, 
-                    capital, code2 FROM country WHERE name LIKE ? ORDER BY name")) {
-                    $stmt->bind_param("s", $searchLike);
-                    $stmt->execute();
-                    $stmt->bind_result($code, $name, $continent, $region, 
-                        $surfacearea, $indepyear, $population, $lifeexpectancy, 
-                        $gnp, $gnpold, $localname, $governmentform, $headofstate, 
-                        $capital, $code2);
-                    $i = 0;
-                    while($stmt->fetch()) {
-                        $tableData[$i++] = array($code, $name, $continent, $region, 
-                        $surfacearea, $indepyear, $population, $lifeexpectancy, 
-                        $gnp, $gnpold, $localname, $governmentform, $headofstate, 
-                        $capital, $code2);
-                    }
-                    array_push($tableHeaders, "Update", "Delete", "code", "name", "continent", "
-                    region", "surfacearea", "indepyear", "population", "lifeexpectancy", 
-                    "gnp", "gnpold", "localname", "governmentform", "headofstate", 
-                    "capital", "code2");
-                    if ( false===$stmt ) {
-                      die('prepare() failed: ' . htmlspecialchars($mylink->error));
-                    }
-                    $stmt->close();
-                }
-            }
-            
-            function showLanguage() {
-                global $mylink;
-                global $tableHeaders;
-                global $searchLike;
-                global $stmt;
-                global $tableData;
-                
-                if($stmt = $mylink->prepare("select CountryCode, Language, IsOfficial, Percentage FROM countrylanguage WHERE language LIKE ? ORDER BY language")) {
-                    
-                    $stmt->bind_param("s", $searchLike);
-                    $stmt->execute();
-                    $stmt->bind_result($countrycode, $language, $isofficial, $percentage);
-                    $i = 0;
-                    while($stmt->fetch()) {
-                        $tableData[$i++] = array($countrycode, $language, $isofficial, $percentage);
-                    }
-                    array_push($tableHeaders, "Update", "Delete", "countrycode", "language", "isofficial", "percentage");
-                    if ( false===$stmt ) {
-                      die('prepare() failed: ' . htmlspecialchars($mylink->error));
-                    }
-                    $stmt->close();
-                }
-            }
-            
-            function findPrimaryKey($table, $row) {
-                if ($table == 'city') {
-                    return $row[0];
-                } 
-                else if ($table == 'country') {
-                    return $row[0];
-                }
-                else if ($table == 'countrylanguage') {
-                    return serialize(array_slice($row, 0, 2));
-                } else {
-                    return "Error in findPrimaryKey()!!";
-                }
-            }
-                
-            switch ($searchingTable) {
+            switch ($_SESSION['table']) {
                 case 'city':
-                    showCity();
+                    showTable();
                     break;
                 case 'country':
-                    showCountry();
+                    showTable();
                     break;
                 case 'countrylanguage':
-                    showLanguage();
+                    showTable();
                     break;
                 default:
                     
             }
             
-            //Check for errors and close link
-            if ( false===$stmt ) {
-              die('prepare() failed: ' . htmlspecialchars($mylink->error));
-            }
             mysqli_close($mylink);
         ?>  
         
@@ -239,13 +135,13 @@
                     foreach ($tableData as $row) {
                         echo "\n\n<tr>\n";
                         echo "<form action='update.php' method='POST'>\n";
-                        echo "<input type='hidden' name='searchingTable' value='$searchingTable'>\n";
-                        echo "<input type='hidden' name='rowData' value='" . findPrimaryKey($searchingTable, $row) . "'>\n";
+                        echo "<input type='hidden' name='searchingTable' value='" . $_SESSION['table'] . "'>\n";
+                        echo "<input type='hidden' name='pk' value='" . findPrimaryKey($_SESSION['table'], $row) . "'>\n";
                         echo "<td><button type='submit' name='update'>Update</button></td>\n";
                         echo "</form>\n";
                         echo "<form action='delete.php' method='POST'>\n";
-                        echo "<input type='hidden' name='searchingTable' value='$searchingTable'>\n";
-                        echo "<input type='hidden' name='rowData' value='" . findPrimaryKey($searchingTable, $row) . "'>\n";
+                        echo "<input type='hidden' name='searchingTable' value='" . $_SESSION['table'] . "'>\n";
+                        echo "<input type='hidden' name='pk' value='" . findPrimaryKey($_SESSION['table'], $row) . "'>\n";
                         echo "<td><button type='submit' name='delete'>Delete</button></td>\n";
                         echo "</form>\n";
                         foreach ($row as $dataPoint) {
