@@ -12,56 +12,33 @@
         <?php
             include_once('header.php');
             
-            //Pre-selected the previously selected radio button
-            function is_selected($value) {
-                if (isset($_POST['fromRadio'])) {
-                    if ($value == $_POST['fromRadio']) {
-                        echo " checked";
-                    } else {
-                        echo "";
-                    }
-                } else {
-                    if ($value == "country") {
-                        echo " checked";
-                    }
+            if(isset($_SESSION['table']) == false) {
+                isset($_POST['fromRadio'])
+                    ? $_SESSION['table'] = $_POST['fromRadio']
+                    : $_SESSION['table'] = "city";
+            } else {
+                if(isset($_POST['fromRadio'])) {
+                    $_SESSION['table'] = $_POST['fromRadio'];
                 }
             }
             
-            function searchValue() {
-                if (isset($_POST['searchText'])) {
-                    echo " value='" . $_POST['searchText'] . "'";
+            if(isset($_SESSION['search']) == false) {
+                if(isset($_POST['searchText'])) {
+                    $_SESSION['search'] = $_POST['searchText'];
+                    $searchLike = $_SESSION['search'] . '%';
                 } else {
-                    echo "";
+                    $searchLike = " ";
                 }
+            } else {
+                if(isset($_POST['searchText'])) {
+                    $_SESSION['search'] = $_POST['searchText'];
+                }
+                
+                $searchLike = $_SESSION['search'] . '%';
             }
             
-            //Decide on Prepare Statement
-            $tableData = array();
-            $tableHeaders = array();
-            $stmt = null;
-            isset($_POST['fromRadio'])
-                ? $_SESSION['table'] = $_POST['fromRadio']
-                : $_SESSION['table'] = "city";
-                
-            isset($_POST['searchText'])
-                ? $searchLike = $_POST['searchText'] . '%'
-                : $searchLike = " ";
-                
-
-            //Find a good way to remove this switch
-            switch ($_SESSION['table']) {
-                case 'city':
-                    showTable();
-                    break;
-                case 'country':
-                    showTable();
-                    break;
-                case 'countrylanguage':
-                    showTable();
-                    break;
-                default:
-                    
-            }
+            
+            showTable();
             
             mysqli_close($mylink);
         ?>  
@@ -94,6 +71,18 @@
             /*     overflow: hidden;*/
             /* }*/
         </style>
+        
+        <script>
+            $(document).ready(function() {
+                $('.delete-btn').click(function() {
+                    if(confirm("Are you sure you want to delete " + $(this).attr('pk'))) {
+                        $.post("delete.php", {pk: $(this).attr('pk')}).done(function(data) {
+                            location.reload();
+                        });
+                    }
+                });
+            });
+        </script>
     </head>
     <body>
         <div class="container">
@@ -119,11 +108,13 @@
                             </label>
                         </div>  
                         <div class="form-group">
-                            <input type="text" class="form-control" name="searchText" id="searchText" placeholder="Search..."<?=searchValue();?>>
+                            <input type="text" class="form-control" name="searchText" id="searchText" placeholder="Search..." value='<?=$_SESSION['search'];?>'>
                         </div>
                         <button type="submit" class="btn btn-default">Submit</button>
                     </div>
+                    <a class="btn btn-default pull-right" href="new_city.php" role="button">Insert City</a> 
                 </form>
+                
                 <br>
             </div>
         </div>
@@ -138,9 +129,9 @@
                         echo "<input type='hidden' name='pk' value='" . findPrimaryKey($_SESSION['table'], $row) . "'>\n";
                         echo "<td><button type='submit' name='update'>Update</button></td>\n";
                         echo "</form>\n";
-                        echo "<form action='delete.php' method='POST'>\n";
-                        echo "<input type='hidden' name='pk' value='" . findPrimaryKey($_SESSION['table'], $row) . "'>\n";
-                        echo "<td><button type='submit' name='delete'>Delete</button></td>\n";
+                        // echo "<form action='delete.php' method='POST'>\n";
+                        // echo "<input type='hidden' name='pk' value='" . findPrimaryKey($_SESSION['table'], $row) . "'>\n";
+                        echo "<td><button type='submit' name='delete' class='delete-btn' pk='" . findPrimaryKey($_SESSION['table'], $row) . "'>Delete</button></td>\n";
                         echo "</form>\n";
                         foreach ($row as $dataPoint) {
                             echo "<td>$dataPoint</td>";

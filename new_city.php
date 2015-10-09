@@ -4,17 +4,16 @@
         <?php
             include_once('header.php');
             
-            // Primary Key Array
-            if(isset($_POST['pk'])) {
-                setSessionPk($_POST['pk']);
-            }
+            //Find
+            $mylink->query("INSERT INTO city (CountryCode) VALUES ((select code from country limit 1))");
+            $newID = $mylink->insert_id;
             
             $stmt = null;
             $fields = array();
             $params = array();
             $rowData = array();
             
-            if($stmt = $mylink->prepare("SELECT * FROM {$_SESSION['table']} WHERE {$_SESSION['pkSqlStr']}")) {
+            if($stmt = $mylink->prepare("SELECT * FROM city WHERE ID = $newID")) {
                 $stmt->execute();
                 $stmt->store_result();
                 $metaData = $stmt->result_metadata();
@@ -26,43 +25,37 @@
                 $stmt->fetch();
             }
             
-            if($_SESSION['table'] == 'country') {
-                $editableFields = array("LocalName", "GovernmentForm", "IndepYear", "Popluation");
-            }
-            else if($_SESSION['table'] == 'city') {
-                $editableFields = array("Population", "District");
-            }
-            else if($_SESSION['table'] == 'countrylanguage') {
-                $editableFields = array("IsOfficial", "Percentage");
-            } else {
-                $editableFields = array();
+            //Find list of CountryCodes
+            $codeArr = array();
+            $codeQy = $mylink->query("SELECT code FROM country");
+            while ($code = $codeQy->fetch_row()) {
+                $codeArr[] = $code[0];
             }
             
-            function disabledAttr($field) {
-                global $editableFields;
-                if (in_array($field, $editableFields)) {
-                    return "";
-                } else {
-                    return "disabled";
+            print_r($codeArr);
+            
+            function inputExtra($fieldName) {
+                $extraStr = "";
+                if($fieldName == "ID") {
+                    $extraStr .= "disabled ";
                 }
+                
+                if($fieldName == "Population") {
+                    $extraStr .= "type='number' min='0' max='99999999999'";
+                } else {
+                    $extraStr .= "type = 'text' ";
+                }
+                
+                return $extraStr;
             }
-            
         ?>
-        
-        <style>
-            .well {
-                text-align: center;
-            }
-        </style>
-        
-       
     </head>
     <body>
         <div class="container">
         <div class="row">
         <div class="col-sm-8 col-sm-offset-2">
-        <div class="well"><h2>Update <?=$_SESSION['table']?></h2></div>
-        <form class="form-horizontal" action="update_action.php" method="POST">
+        <div class="well"><h2>Insert New City</h2></div>
+        <form class="form-horizontal" action="new_city_action.php" method="POST">
             
             <?php
                 if(isset($_SESSION['message'])) {
@@ -73,7 +66,14 @@
                     echo "<div class='form-group'>\n";
                     echo "<label for='$field' class='col-sm-2'>$field</label><br>\n";
                     echo "<div class='col-sm-11 col-sm-offset-1'>\n";
-                    echo "<input type='text' class='form-control' id='$field' name='$field' value='" . $rowData[$field] . "' " . disabledAttr($field) . ">\n";
+                    if($field != 'Countrycode') {
+                        echo "<input class='form-control' id='$field' name='$field' value='" . $rowData[$field] . "' " . inputExtra($field) . ">\n";
+                    } else {
+                        echo "<select class='form-control'>\n";
+                        foreach($codeArr as $code) {
+                            echo "<option>$code</option>\n";
+                        }
+                    }
                     echo "</div>\n";
                     echo "</div>\n";
                 }
@@ -85,5 +85,6 @@
             </div>
         </form>
         </div></div></div>
+        
     </body>
 </html>

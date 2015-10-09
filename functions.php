@@ -12,14 +12,14 @@
         if ($_SESSION['table'] == 'city') {
             $searchWhere = 'name';
         }
-        else if ($_SESSION['table'] == 'country') {
+        elseif ($_SESSION['table'] == 'country') {
             $searchWhere = 'name';
         }
         if ($_SESSION['table'] == 'countrylanguage') {
             $searchWhere = 'language';
         }
         
-        if ($stmt = $mylink->prepare("SELECT * FROM {$_SESSION['table']} WHERE $searchWhere LIKE ?")) {
+        if ($stmt = $mylink->prepare("SELECT * FROM {$_SESSION['table']} WHERE $searchWhere LIKE ? ORDER BY $searchWhere")) {
             $stmt->bind_param("s", $searchLike);
             $stmt->execute();
             $stmt->store_result();
@@ -144,13 +144,49 @@
         if ($table == 'city') {
             return serialize(array('ID' => $row['ID']));
         } 
-        else if ($table == 'country') {
+        elseif ($table == 'country') {
             return serialize(array('Code' => $row['Code']));
         }
-        else if ($table == 'countrylanguage') {
+        elseif ($table == 'countrylanguage') {
             return serialize(array('CountryCode' => $row['CountryCode'], 'Language' => $row['Language']));
         } else {
             return "Error in findPrimaryKey()!!";
+        }
+    }
+    
+    function is_selected($value) {
+        if (isset($_SESSION['table'])) {
+            if ($value == $_SESSION['table']) {
+                echo " checked";
+            } else {
+                echo "";
+            }
+        } else {
+            if ($value == "country") {
+                echo " checked";
+            }
+        }
+    }
+    
+    //Obsolete
+    function searchValue() {
+        if (isset($_POST['searchText'])) {
+            echo " value='" . $_POST['searchText'] . "'";
+        } else {
+            echo "";
+        }
+    }
+    
+    function setSessionPk($serialPk) {
+        $_SESSION['pkArray'] = unserialize($serialPk);
+        
+        $_SESSION['pkSqlStr'] = "";
+        foreach($_SESSION['pkArray'] as $key => $value) {
+            $_SESSION['pkSqlStr'] .= "$key = '$value'";
+            end($_SESSION['pkArray']);
+            if($key != key($_SESSION['pkArray'])) {
+                $_SESSION['pkSqlStr'] .= " AND ";
+            }
         }
     }
 ?>

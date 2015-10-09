@@ -1,15 +1,18 @@
-<!DOCTYPE html>
-<html>
-    <head>
-        <?php
-            include_once('header.php');
-        ?>
-    </head>
-    <body>
-        <?php
-            echo $_POST['searchingTable'];
-            echo "<br><hr><br>";
-            print_r(unserialize($_POST['rowData']));
-        ?>
-    </body>
-</html>
+<?php
+    include_once('database_and_functions.php');
+    
+    setSessionPk($_POST['pk']);
+    
+    print_r($_SESSION['pkArray']);
+    
+    $sql = "DELETE FROM {$_SESSION['table']} WHERE {$_SESSION['pkSqlStr']} LIMIT 1";
+    echo $sql;
+    
+    if ($mylink->query("DELETE FROM {$_SESSION['table']} WHERE {$_SESSION['pkSqlStr']} LIMIT 1") === TRUE) {
+        echo "Record updated successfully";
+    } else {
+        echo "Error updating record: " . $mylink->error;
+    }
+    
+    
+?>
