@@ -28,6 +28,7 @@
                     $searchLike = $_SESSION['search'] . '%';
                 } else {
                     $searchLike = " ";
+                    $_SESSION['search'] = "";
                 }
             } else {
                 if(isset($_POST['searchText'])) {

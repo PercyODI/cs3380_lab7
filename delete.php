@@ -9,7 +9,9 @@
     }
     
     $sql = "DELETE FROM {$_SESSION['table']} WHERE {$_SESSION['pkSqlStr']} LIMIT 1";
-    echo $sql;
+    echo "<script>console.log($sql);</script>";
+    
+    
     
     if ($mylink->query("DELETE FROM {$_SESSION['table']} WHERE {$_SESSION['pkSqlStr']} LIMIT 1") === TRUE) {
         $_SESSION['message'] = "Record updated successfully";

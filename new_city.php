@@ -60,8 +60,14 @@
         </style>
         
         <script>
-            $('#cancel-btn').click(function() {
-                $.post("delete.php", {cancelDel: "ID = " + $('#ID').val}).done(function(data) {});
+            $(document).ready(function () {
+                $('#cancel-btn').click(function(e) {
+                    confirm("Are you watching?");
+                    console.log("ID = " + $('#ID').val());
+                    $.post("delete.php", {cancelDel: "ID = " + $('#ID').val()}).done(function(data) {
+                        console.log(data);
+                    });
+                });
             });
         </script>
     </head>
