@@ -4,39 +4,25 @@
         <?php
             include_once('header.php');
             
-            //Save searchingTable
-            $_SESSION['searchingTable'] = $_POST['searchingTable'];
-            $_SESSION['pk'] = unserialize($_POST['pk']);
+            // Primary Key Array
+            $_SESSION['pkArray'] = unserialize($_POST['pk']);
             
-            // Sets where string
-            foreach($_SESSION['pk'] as $key => $value) {
-                $whereStr = "$key = '$value'";
-                end($_SESSION['pk']);
-                if($key != key($_SESSION['pk'])) {
-                    $whereStr .= " and ";
+            // Primary Key String for use in SQL statements
+            foreach($_SESSION['pkArray'] as $key => $value) {
+                $_SESSION['pkSqlStr'] = "$key = '$value'";
+                end($_SESSION['pkArray']);
+                if($key != key($_SESSION['pkArray'])) {
+                    $_SESSION['pkSqlStr'] .= " and ";
                 }
             }
-            
-            //Set Where String
-            // if ($_POST['searchingTable'] == "country") {
-            //     $whereStr = "code = '" . $_POST['rowData'] . "'";
-            // }
-            // else if($_POST['searchingTable'] == "city") {
-            //     $whereStr = "id = " . $_POST['rowData'];
-            // }
-            // else if($_POST['searchingTable'] == "countrylanguage") {
-            //     $rowDataArr = unserialize($_POST['rowData']);
-            //     $whereStr = "countrycode = '" . $rowDataArr[0] . "' and language = '" . $rowDataArr[1] . "'";
-            // } else {
-            //     echo "Error is Set Where String!";
-            // }
+            print $_SESSION['pkSqlStr'];
             
             $stmt = null;
             $fields = array();
             $params = array();
             $rowData = array();
             
-            if($stmt = $mylink->prepare("SELECT * FROM {$_POST['searchingTable']} WHERE $whereStr")) {
+            if($stmt = $mylink->prepare("SELECT * FROM {$_SESSION['table']} WHERE {$_SESSION['pkSqlStr']}")) {
                 $stmt->execute();
                 $stmt->store_result();
                 $metaData = $stmt->result_metadata();
@@ -62,7 +48,7 @@
         <div class="container">
         <div class="row">
         <div class="col-sm-8 col-sm-offset-2">
-        <div class="well"><h2>Update <?=$_POST['searchingTable']?></h2></div>
+        <div class="well"><h2>Update <?=$_SESSION['table']?></h2></div>
         <form class="form-horizontal" action="update_action.php" method="POST">
             
             <?php

@@ -48,7 +48,7 @@
                 : $searchLike = " ";
                 
 
-                
+            //Find a good way to remove this switch
             switch ($_SESSION['table']) {
                 case 'city':
                     showTable();
@@ -135,12 +135,10 @@
                     foreach ($tableData as $row) {
                         echo "\n\n<tr>\n";
                         echo "<form action='update.php' method='POST'>\n";
-                        echo "<input type='hidden' name='searchingTable' value='" . $_SESSION['table'] . "'>\n";
                         echo "<input type='hidden' name='pk' value='" . findPrimaryKey($_SESSION['table'], $row) . "'>\n";
                         echo "<td><button type='submit' name='update'>Update</button></td>\n";
                         echo "</form>\n";
                         echo "<form action='delete.php' method='POST'>\n";
-                        echo "<input type='hidden' name='searchingTable' value='" . $_SESSION['table'] . "'>\n";
                         echo "<input type='hidden' name='pk' value='" . findPrimaryKey($_SESSION['table'], $row) . "'>\n";
                         echo "<td><button type='submit' name='delete'>Delete</button></td>\n";
                         echo "</form>\n";
