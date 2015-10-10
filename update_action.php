@@ -19,7 +19,10 @@
             $sql .= " WHERE " . $_SESSION['pkSqlStr'];
             // echo $sql;
             
-            if ($mylink->query($sql) === TRUE) {
+            if ($stmt = $mylink->prepare($sql)) {
+                $stmt->execute();
+                $stmt->close();
+                $_SESSION['message'] = "Record Successfully Updated";
                 header('Location: index.php');
             } else {
                 $_SESSION['message'] = "Error updating record: " . $mylink->error;

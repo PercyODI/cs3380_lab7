@@ -32,9 +32,11 @@
             
             //Find list of CountryCodes
             $codeArr = array();
-            $codeQy = $mylink->query("SELECT code, name FROM country ORDER BY name");
-            while ($code = $codeQy->fetch_assoc()) {
-                $codeArr[$code['code']] = $code['name'];
+            $stmt = $mylink->prepare("SELECT code, name FROM country ORDER BY name");
+            $stmt->execute();
+            $stmt->bind_result($code, $name);
+            while ($stmt->fetch()) {
+                $codeArr[$code] = $name;
             }
             
             function inputExtra($fieldName) {
