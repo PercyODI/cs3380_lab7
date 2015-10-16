@@ -15,6 +15,10 @@
     $DATABASE = 'cs3380-pah9qd';
     
     $mylink = new mysqli($SERVER, $USER, $PASS, $DATABASE);
+    if (!$mylink->set_charset("utf8")) {
+        printf("Error loading character set utf8: %s\n", $mysqli->error);
+        exit();
+    }
     $_SESSION['mylink'] = $mylink;
     
     // include_once('functions.php');

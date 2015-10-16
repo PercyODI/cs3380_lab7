@@ -5,15 +5,27 @@ $selected_table = $_GET['table-input'];
 $search_text = $_GET['search-input'] . '%';
 
 // This function actually prints the requested data
-function printTable($tableData) {
+function printTable($tableData, $pkField,  $table, $secondPkField = null) {
+    if(empty($tableData)) {
+        echo "No records found for search query";
+        exit;
+    }
     echo "<table class='table table-hover'>\n";
     echo "<tr>\n";
+    echo "<th>Update</th><th>Delete</th>";
     foreach($tableData[0] as $header => $val) {
         echo "<th>$header</th>\n";
     }
     echo "</tr>\n";
     foreach($tableData as $row) {
+        $serialPk = serialize(array("{$pkField}" => $row["{$pkField}"],  
+            "{$secondPkField}" => !is_null($secondPkField) 
+                ? $row["{$secondPkField}"] 
+                : null,
+            "Table" => $table));
         echo "<tr>\n";
+        echo "<td><button type='button' class='btn btn-default table-btn update-btn' pk='$serialPk'>Update</button></td>";
+        echo "<td><button type='button' class='btn btn-default table-btn delete-btn'>Delete</button></td>";
         foreach($row as $dataPoint) {
             echo "<td>$dataPoint</td>\n";
         }
@@ -37,7 +49,7 @@ function showCityTable() {
         }
     }
     
-    printTable($tableData);
+    printTable($tableData, "ID", "city");
 }
 
 function showCountryTable() {
@@ -59,7 +71,7 @@ function showCountryTable() {
         }
     }
     
-    printTable($tableData);
+    printTable($tableData, "Code", "country");
 }
 
 function showLanguageTable() {
@@ -77,7 +89,7 @@ function showLanguageTable() {
         }
     }
     
-    printTable($tableData);
+    printTable($tableData, "Country Code", "countrylanguage", "Language");
 }
 
 switch ($selected_table) {
@@ -85,7 +97,7 @@ switch ($selected_table) {
         showCityTable();
         break;
     case "country":
-        showCityTable();
+        showCountryTable();
         break;
     case "language":
         showLanguageTable();

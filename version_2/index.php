@@ -17,8 +17,8 @@
             
             //Select the correct radio button
             var checkedRadio = "<?php echo (isset($_GET['table-input']) ? $_GET['table-input'] : '') ?>";
-            $(".table-radio").each(function() {
-                if($(this).val() == checkedRadio) {
+            $(".table-radio").each(function(i) {
+                if($(this).val() == checkedRadio || i == $(".table-radio").length - 1) {
                     $(this).prop('checked', true);
                 }
                 
@@ -26,11 +26,32 @@
             
             //Fill .display-results
             $("#search-form").submit(function(e) {
+                e.preventDefault();
                 console.log("submit?");
                 $.get("display_table.php", $(this).serialize(), function(data) {
                     $(".display-results").html(data);
+                    
+                    //Bind click action to update buttons
+                    $(".update-btn").click(function() {
+                        $.get("update_show.php", {pk: $(this).attr("pk")}, function(update_data) {
+                            var updatePop = $(".update-popup");
+                            updatePop.html(update_data);
+                            updatePop.offset({top: 45, left: 45});
+                            updatePop.css("background-color", "lightgray");
+                            updatePop.width($(window).width() - 90);
+                            console.dir($(this));
+                        });
+                        // console.dir($(this).parents("tr"));
+                    });
+                    
+                    //Bind click action delete buttons
+                    $(".delete-btn").click(function() {
+                        console.dir($(this).parents("tr"));
+                    });
                 });
-                e.preventDefault();
+                
+                
+                
             });
             
         });
