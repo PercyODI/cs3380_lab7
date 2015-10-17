@@ -10,7 +10,9 @@
     ?>
     
     <style id="custom-style">
-        
+        .update-popup {
+            padding: 20px;
+        }
     </style>
     <script>
         $(document).ready(function() {
@@ -36,11 +38,22 @@
                         $.get("update_show.php", {pk: $(this).attr("pk")}, function(update_data) {
                             var updatePop = $(".update-popup");
                             updatePop.html(update_data);
+                            updatePop.show('slow');
                             updatePop.offset({top: 45, left: 45});
-                            updatePop.css("background-color", "lightgray");
+                            updatePop.css("background-color", "white");
+                            updatePop.css("border", "1px outset black");
+                            updatePop.css("box-shadow", "0 0 5px gray");
+                            updatePop.css("border-radius", "5px");
+                            
                             updatePop.width($(window).width() - 90);
+                            
+                            $('#update-cancel-btn').click(function() {
+                                updatePop.hide('slow');
+                            });
+                            
                             console.dir($(this));
-                        });
+                            });
+                        
                         // console.dir($(this).parents("tr"));
                     });
                     

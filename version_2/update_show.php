@@ -5,11 +5,18 @@ $pkArray = unserialize($_GET['pk']);
 // print_r($pkArray);
 // echo "<br><hr><br>";
 
-function displayUpdate($tableData, $editableFields) {
+function displayUpdate($tableData, $editableFields, $pk) {
     echo "<form>\n";
     foreach($tableData as $field => $val) {
-        <div class="">
+        in_array($field, $editableFields) ? $disabled = "" : $disabled = " disabled";
+        echo "<div class='form-group'>\n";
+        echo "<label for='$field'>$field</label>\n";
+        echo "<input type='text' class='form-control' value='$val' $disabled>";
+        echo "</div>";
     }
+    echo "<button type='button' class='btn btn-default' id='update-submit-btn' pk='$pk' table='" . $pkArray["Table"] . "'>Submit</button>\n";
+    echo "<button type='button' class='btn btn-default' id='update-cancel-btn'>Cancel</button>\n";
+    echo "</form>\n<p></p>";
 }
 
 function showCityUpdate() {
@@ -24,10 +31,13 @@ function showCityUpdate() {
         $stmt->bind_result($id, $name, $countrycode, $district, $population);
         if($stmt->fetch()) {
             $tableData = array("ID" => $id, "Name" => $name, "Country Code" => $countrycode, "District" => $district, "Population" => $population);
+        
+            $pk = serialize(array("ID" => $id));
         }
     }
     $editableFields = array("Population", "District");
-    displayUpdate($tableData, $editableFields);
+    
+    displayUpdate($tableData, $editableFields, $pk);
 }
 
 function showCountryUpdate() {
@@ -41,11 +51,14 @@ function showCountryUpdate() {
         $stmt->execute();
         $stmt->bind_result($code, $name, $continent, $region, $surfacearea, $indepyear, $population, $lifeexpectancy, $gnp, $gnpold, $localname, $governmentform, $headofstate, $capital, $code2);
         if($stmt->fetch()) {
-            $tableData[] = array("Code" => $code, "Name" => $name, "Continent" => $continent, 
+            $tableData = array("Code" => $code, "Name" => $name, "Continent" => $continent, 
                 "Region" => $region, "Surface Area" => $surfacearea, "Independence Year" => $indepyear, 
                 "Population" => $population, "Life Expectancy" => $lifeexpectancy, "GNP" => $gnp,
                 "GNP Old" => $gnpold, "Local Name" => $localname, "Government Form" => $governmentform, 
-                "Head of State" => $headofstate, "Capital" => $capital, "Code 2" => $code2);        }
+                "Head of State" => $headofstate, "Capital" => $capital, "Code 2" => $code2);
+                
+                $pk = serialize(array("Code" => $code));
+        }
     }
     $editableFields = array("Local Name", "Government Form", "Independence Year", "Population");
     displayUpdate($tableData, $editableFields);
@@ -62,7 +75,9 @@ function showLanguageUpdate() {
         $stmt->execute();
         $stmt->bind_result($CountryCode, $Language, $IsOfficial, $Percentage);
         if($stmt->fetch()) {
-            $tableData[] = array("Country Code" => $CountryCode, "Language" => $Language, "Is Offical?" => $IsOfficial, "Percentage" => $Percentage);
+            $tableData = array("Country Code" => $CountryCode, "Language" => $Language, "Is Offical?" => $IsOfficial, "Percentage" => $Percentage);
+            
+            $pk = serialize(array("Country Code" => $CountryCode, "Language" => $Language));
         }
     }
     $editableFields = array("Is Official?", "Percentage");
